@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/line/line-bot-sdk-go/linebot"
@@ -36,6 +37,8 @@ func NewServer(cfg *Config) (*API, error) {
 
 func (a *API) Run() error {
 	log.Print("Run server")
+	r := NewRouter(a)
+	r.Run(fmt.Sprint(":", a.Port))
 
 	return nil
 }
