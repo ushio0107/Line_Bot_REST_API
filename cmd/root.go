@@ -77,42 +77,9 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
 	rootCmd.Flags().StringVar(&cfg.LineCfg, "lineCfg", lineCfgFile, "")
 	rootCmd.Flags().StringVar(&cfg.ServerCfg, "serverCfg", serverCfgFile, "")
-
-	// rootCmd.Flags().StringVar(&dbCfg, "dbCfg", mongodbCfgFile, "")
+	rootCmd.Flags().StringVar(&dbCfg, "dbCfg", mongodbCfgFile, "")
 
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
-
-func initConfig() {
-	log.Print(cfg)
-
-	// cfg.LineCfg = lineCfgFile
-	// cfg.DBCfg =
-	// cfg.ServerCfg = serverCfgFile
-	// for cfg, cfgFile := range map[string]string{
-	// 	lineCfgFile: lineCfgFile,
-	// 	// dbCfg:     mongodbCfgFile,
-	// 	serverCfg: serverCfgFile,
-	// } {
-	// 	if cfg != cfgFile {
-	// 		log.Print(cfg)
-	// 		// If the input config file isn't the same as the default config file,
-	// 		// set the input config file as the config file.
-	// 		SetConfig(cfg)
-	// 	}
-	// }
-}
-
-// func SetConfig(cfg string) {
-// 	vp := viper.New()
-// 	vp.SetConfigFile(cfg)
-// 	vp.AutomaticEnv()
-
-// 	if err := vp.ReadInConfig(); err != nil {
-// 		fmt.Println("Failed to read config: ", err)
-// 		os.Exit(1)
-// 	}
-// }

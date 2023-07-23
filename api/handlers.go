@@ -13,6 +13,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+// receiveHandler is the API handler, which reply the user if it's received any message,
+// and save the user message to the DB.
 func (a *API) receiveHandler(ctx *gin.Context) {
 	events, err := a.LineBotClient.ParseRequest(ctx.Request)
 	if err != nil {
@@ -38,6 +40,7 @@ func (a *API) receiveHandler(ctx *gin.Context) {
 	}
 }
 
+// broadcastMessage broadcasts message to all users.
 func (a *API) broadcastMessage(ctx *gin.Context) {
 	var message ReplyMessage
 	json.NewDecoder(ctx.Request.Body).Decode(&message)
@@ -60,26 +63,25 @@ func (a *API) broadcastMessage(ctx *gin.Context) {
 	}
 }
 
+// getAllMessages gets all messages stored in db.
 func (a *API) getAllMessages(ctx *gin.Context) {
-	var linemessage LineEvent
+	var event LineEvent
 	var results []LineEvent
 
 	c, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	// set a cursor
 	cursor, err := a.Collection.Find(c, bson.D{})
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	// loop through all results and save in results slice
 	for cursor.Next(context.Background()) {
-		if err := cursor.Decode(&linemessage); err != nil {
+		if err := cursor.Decode(&event); err != nil {
 			log.Fatal(err)
 		}
-		results = append(results, linemessage)
+		results = append(results, event)
 	}
 
 	ctx.JSON(http.StatusOK, results)
