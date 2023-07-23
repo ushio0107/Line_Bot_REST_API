@@ -7,6 +7,7 @@ func NewRouter(a *API) *gin.Engine {
 
 	r := router.Group("/linebot")
 	r.POST("", a.receiveHandler)
+	r.POST("/broadcast", a.broadcastMessage)
 
 	return router
 }
