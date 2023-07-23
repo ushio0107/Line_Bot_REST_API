@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/line/line-bot-sdk-go/linebot"
@@ -56,4 +58,29 @@ func (a *API) broadcastMessage(ctx *gin.Context) {
 			}
 		}
 	}
+}
+
+func (a *API) getAllMessages(ctx *gin.Context) {
+	var linemessage LineEvent
+	var results []LineEvent
+
+	c, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// set a cursor
+	cursor, err := a.Collection.Find(c, bson.D{})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	// loop through all results and save in results slice
+	for cursor.Next(context.Background()) {
+		if err := cursor.Decode(&linemessage); err != nil {
+			log.Fatal(err)
+		}
+		results = append(results, linemessage)
+	}
+
+	ctx.JSON(http.StatusOK, results)
 }

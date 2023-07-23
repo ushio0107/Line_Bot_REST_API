@@ -23,3 +23,63 @@ use below golang libs
     - commit #6 Create a API send message back to line
     - commit #7 Create a API query message list of the user from MongoDB
     - provide a demo video or steps of test (or postman)
+
+## Use this repo
+`git clone git@github.com:ushio0107/M800_Backend_Homework.git`
+
+## Prepare
+1. Prepare you docker env:
+```bash
+brew install docker
+cd <repo path>/M800_Backend_Homework
+make docker_mongo_image
+make docker_install
+docker ps -a # Confirmed the docker container is running.
+```
+2. Prepare your ngrok
+    1. Go to its page and download.
+    2. 
+    ```
+    cd <path where ngrok.zip is> 
+    unzip /path/to/ngrok.zip  
+    ./ngrok http 8080
+    ```
+    3. Get the public address
+
+3. Create your official Line account
+    1. Get your own `Channel secret` and  `Channel Access Token`, add them to the repo `/M800_Backend_Homework/config/line_config.yml`
+    2. Click toggle `Webhook` to `on`, and add the public address you create by ngrok to `Webhook URL`
+
+4. Config your own settings inside `/M800_Backend_Homework/config/`
+
+## Run this repo
+`go run main.go`
+
+### Flag
+```
+Usage:
+  m800_homework [flags]
+
+Flags:
+  -h, --help               help for m800_homework
+      --lineCfg string      (default "./config/line_config.yml")
+      --serverCfg string    (default "./config/server_config.yml")
+  -t, --toggle             Help message for toggle
+```
+
+## Demo
+1. Watch the video inside `demo/demo_video.mov`
+
+- `GET https://127.0.0.1/linebot/get`
+    - Get all the messages and user info which stored in the MongoDB
+    ![image](./demo/GET.png)
+
+- `POST https://127.0.0.1/linebot/`
+    - Tell the users who sent message to the line bot that the line bot has got the message, and save that message to MongoDB at the same time.
+    ![image](./demo/POST.png)
+
+- `POST https://127.0.0.1/linebot/broadcast`
+    - Send a message to users.
+    ![image](./demo/POST_BROADCAST.png)
+
+

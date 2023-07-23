@@ -43,6 +43,7 @@ type ServerConfig struct {
 	Port string `mapstructure:"port"`
 }
 
+// ReplyMessage structure
 type ReplyMessage struct {
 	Message string `mapstructure:"message"`
 }
