@@ -1,0 +1,4 @@
+dbUser: "root"
+dbpwd: "123456"
+dbName: "line_bot"
+collectionName: "line_bot"
