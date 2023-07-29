@@ -1,12 +1,16 @@
 package api
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
+
+	"m800_homework/api/util"
 
 	"github.com/gin-gonic/gin"
 	"github.com/line/line-bot-sdk-go/linebot"
@@ -21,6 +25,7 @@ func (a *API) receiveHandler(ctx *gin.Context) {
 		if err == linebot.ErrInvalidSignature {
 			ctx.Writer.WriteHeader(400)
 		} else {
+			log.Print(err)
 			ctx.Writer.WriteHeader(500)
 		}
 		return
@@ -85,4 +90,41 @@ func (a *API) getAllMessages(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, results)
+}
+
+func (a *API) filterMessage(ctx *gin.Context) {
+	bodyBytes, err := ioutil.ReadAll(ctx.Request.Body)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		ctx.Abort()
+		return
+	}
+	ctx.Request.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+
+	events, err := a.LineBotClient.ParseRequest(ctx.Request)
+	if err != nil {
+		if err == linebot.ErrInvalidSignature {
+			ctx.Writer.WriteHeader(400)
+		} else {
+			ctx.Writer.WriteHeader(500)
+		}
+		return
+	}
+
+	for _, event := range events {
+		switch message := event.Message.(type) {
+		case *linebot.TextMessage:
+			text := message.Text
+			if util.IsSensitive(text, a.KeyCollection) {
+				if _, err := a.LineBotClient.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("Sensitive message")).Do(); err != nil {
+					log.Print("Failed to reply message: ", err)
+				}
+				ctx.JSON(http.StatusForbidden, gin.H{"error": "Sensitive message"})
+				ctx.Abort()
+				return
+			}
+		}
+	}
+	ctx.Request.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+	ctx.Next()
 }

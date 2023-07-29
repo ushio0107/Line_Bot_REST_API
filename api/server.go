@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 
+	"m800_homework/api/util"
+
 	"github.com/line/line-bot-sdk-go/linebot"
 )
 
@@ -25,10 +27,15 @@ func NewServer(cfg *Config) (*API, error) {
 		return nil, err
 	}
 	collection := db.Database(settings.Mongo.DBName).Collection(settings.Mongo.CollectionName)
+	keywordCollection := db.Database(settings.Mongo.DBName).Collection("words")
+	if err := util.SetKeywords(keywordCollection, "./config/keywords.txt"); err != nil {
+		return nil, err
+	}
 	log.Print(settings.Mongo.DBName, settings.Mongo.CollectionName)
 
 	return &API{
 		Collection:    collection,
+		KeyCollection: keywordCollection,
 		Port:          settings.Server.Port,
 		LineBotClient: line,
 		MongoClient:   db,

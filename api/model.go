@@ -12,6 +12,7 @@ type API struct {
 	LineBotClient *linebot.Client
 	MongoClient   *mongo.Client
 	Collection    *mongo.Collection
+	KeyCollection *mongo.Collection
 }
 
 type Settings struct {

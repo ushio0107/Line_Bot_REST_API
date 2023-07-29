@@ -1,5 +1,8 @@
 # M800 Backend Homework
 
+## API
+![diagram](./demo/API.jpg)
+
 ## Requirements
 - RESTful (JSON format) API
 - mongoDB basic operation
@@ -52,6 +55,8 @@ docker ps -a # Confirmed the docker container is running.
 
 4. Config your own settings inside `/M800_Backend_Homework/config/`
 
+5. Add your own keywords inside `./config/keywords.txt`
+
 ## Run this repo
 `go run main.go`
 
@@ -76,10 +81,13 @@ Flags:
 
 - `POST https://127.0.0.1/linebot/`
     - Tell the users who sent message to the line bot that the line bot has got the message, and save that message to MongoDB at the same time.
+    - There will be a keyword filter. Every time the user sends a message to the line bot, the filter will check if there any sensitive keyword contains. If a sensitive keyword is contained inside the message, the API will response `403` and reply the user that he/she sends a sensitive message.
     ![image](./demo/POST.png)
 
 - `POST https://127.0.0.1/linebot/broadcast`
     - Send a message to users.
     ![image](./demo/POST_BROADCAST.png)
 
-
+## Note
+1. Sensitive keywords are stored inside the MongoDB, with collection `words` in DB `line_bot`, you can manage your sensitive keywords inside the MongoDB. 
+2. Keywords inside `./config/keywords.txt` will be inserted to the DB everytime we run this repo, but repeated keywords won't be inserted.
